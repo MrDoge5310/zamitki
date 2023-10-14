@@ -1,5 +1,5 @@
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QLabel, QListWidget, QLineEdit, QTextEdit, QInputDialog, QHBoxLayout, QVBoxLayout, QFormLayout
+from PyQt5.QtWidgets import QMessageBox, QApplication, QWidget, QPushButton, QLabel, QListWidget, QLineEdit, QTextEdit, QInputDialog, QHBoxLayout, QVBoxLayout, QFormLayout
 
 
 import json
@@ -66,8 +66,8 @@ col_2.addLayout(row_3)
 col_2.addLayout(row_4)
 
 
-layout_notes.addLayout(col_1, stretch = 2)
-layout_notes.addLayout(col_2, stretch = 1)
+layout_notes.addLayout(col_1, stretch=2)
+layout_notes.addLayout(col_2, stretch=1)
 notes_win.setLayout(layout_notes)
 
 
@@ -86,8 +86,37 @@ def add_note():
         list_tags.addItems(notes[note_name]["теги"])
 
 
+def save_note():
+    if list_notes.selectedItems():
+        key = list_notes.selectedItems()[0].text()
+        notes[key]["текст"] = field_text.toPlainText()
+
+        with open('notes_data.json', 'w') as file:
+            json.dump(notes, file, ensure_ascii=False)
+
+        QMessageBox.information(notes_win, "Успішно", "Замітку збережено")
+    else:
+        QMessageBox.warning(notes_win, "Помилка", "Оберіть замітку")
+
+
+def delete_note():
+    if list_notes.selectedItems():
+        key = list_notes.selectedItems()[0].text()
+        del notes[key]
+        field_text.clear()
+        list_notes.clear()
+        list_tags.clear()
+        list_notes.addItems(notes)
+        with open('notes_data.json', 'w') as file:
+            json.dump(notes, file, ensure_ascii=False)
+    else:
+        QMessageBox.warning(notes_win, "Помилка", "Оберіть замітку")
+
+
 list_notes.itemClicked.connect(show_note)
 button_note_create.clicked.connect(add_note)
+button_note_save.clicked.connect(save_note)
+button_note_del.clicked.connect(delete_note)
 
 # запуск програми
 notes_win.show()
