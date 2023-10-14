@@ -113,10 +113,27 @@ def delete_note():
         QMessageBox.warning(notes_win, "Помилка", "Оберіть замітку")
 
 
+def add_tag():
+    if list_notes.selectedItems():
+        key = list_notes.selectedItems()[0].text()
+        tag = field_tag.text()
+        if tag not in notes[key]['теги']:
+            notes[key]["теги"].append(tag)
+            list_tags.addItem(tag)
+            field_tag.clear()
+            with open('notes_data.json', 'w') as file:
+                json.dump(notes, file, ensure_ascii=False)
+        else:
+            QMessageBox.information(notes_win, "Помилка", "Такий тег вже існує")
+    else:
+        QMessageBox.warning(notes_win, "Помилка", "Оберіть замітку")
+
+
 list_notes.itemClicked.connect(show_note)
 button_note_create.clicked.connect(add_note)
 button_note_save.clicked.connect(save_note)
 button_note_del.clicked.connect(delete_note)
+button_tag_add.clicked.connect(add_tag)
 
 # запуск програми
 notes_win.show()
