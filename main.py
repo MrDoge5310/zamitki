@@ -129,11 +129,49 @@ def add_tag():
         QMessageBox.warning(notes_win, "Помилка", "Оберіть замітку")
 
 
+def del_tag():
+    if list_tags.selectedItems():
+        key = list_notes.selectedItems()[0].text()
+        tag = list_tags.selectedItems()[0].text()
+        notes[key]["теги"].remove(tag)
+        list_tags.clear()
+        list_tags.addItems(notes[key]["теги"])
+
+        with open('notes_data.json', 'w') as file:
+            json.dump(notes, file, ensure_ascii=False)
+
+    else:
+        QMessageBox.warning(notes_win, "Помилка", "Оберіть тег")
+
+
+def search_note():
+    tag = field_tag.text()
+    if button_tag_search.text() == "Шукати замітки по тегу" and tag:
+        kak_to = {}
+        for note in notes:
+            if tag in notes[note]["теги"]:
+                kak_to[note] = notes[note]
+        button_tag_search.setText("Скинути пошук")
+        list_notes.clear()
+        list_tags.clear()
+        list_notes.addItems(kak_to)
+    elif button_tag_search.text() == "Скинути пошук":
+        list_notes.clear()
+        list_tags.clear()
+        field_tag.clear()
+        list_notes.addItems(notes)
+        button_tag_search.setText("Шукати замітки по тегу")
+    else:
+        QMessageBox.warning(notes_win, "Помилка", "Введіть тег")
+
 list_notes.itemClicked.connect(show_note)
 button_note_create.clicked.connect(add_note)
 button_note_save.clicked.connect(save_note)
 button_note_del.clicked.connect(delete_note)
 button_tag_add.clicked.connect(add_tag)
+button_tag_del.clicked.connect(del_tag)
+button_tag_search.clicked.connect(search_note)
+
 
 # запуск програми
 notes_win.show()
@@ -141,6 +179,5 @@ notes_win.show()
 with open('notes_data.json', 'r') as file:
     notes = json.load(file)
 list_notes.addItems(notes)
-
 
 app.exec_()
